@@ -1,13 +1,9 @@
 GEM
-  remote: http://rubygems.org/
+  remote: https://rubygems.org/
   specs:
     ansi (1.4.2)
-    eventmachine (0.12.10)
-    minitar (0.5.3)
     nokogiri (1.5.4)
     paint (0.8.5)
-    ruby-tmx (0.0.1.dev)
-      nokogiri
     turn (0.9.5)
       ansi
 
@@ -15,9 +11,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  eventmachine
-  minitar
   nokogiri
   paint
-  ruby-tmx
   turn

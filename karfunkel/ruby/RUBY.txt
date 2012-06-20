@@ -1,3 +1,0 @@
-This directory is platform-dependant! 
-It will contain a Ruby Interpreter for your OS and architecture!
-It will be created by the Windows installer or if you extract a binary archive!
