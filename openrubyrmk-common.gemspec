@@ -18,10 +18,12 @@ DESC
   spec.homepage              = "http://devel.pegasus-alpha.eu/projects/openrubyrmk"
   spec.platform              = Gem::Platform::RUBY
   spec.required_ruby_version = ">= 1.9"
-  
-  # Dependencies
-  spec.add_development_dependency("hanna-nouveau", ">= 0.2.4")
 
+  # Dependencies
+  spec.add_dependency("nokogiri")
+  spec.add_development_dependency("paint")
+  spec.add_development_dependency("turn")
+  
   # Gem files
   spec.files = Dir["lib/**/*.rb", "test/test_*.rb", "README.rdoc",
                    "COPYING", "VERSION"]
