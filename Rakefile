@@ -6,14 +6,6 @@ require "rake/testtask"
 require "rake/clean"
 require "rubygems/package_task"
 
-require_relative "lib/open_ruby_rmk/common"
-
-########################################
-# General information
-########################################
-
-PROJECT_TITLE = "OpenRubyRMK common library"
-
 ########################################
 # Gemspec
 ########################################
@@ -30,7 +22,7 @@ RDoc::Task.new do |rt|
   rt.rdoc_files.include("lib/**/*.rb", "**/*.rdoc", "COPYING")
   rt.rdoc_files.exclude("server/lib/open_ruby_rmk/karfunkel/server_management/requests/*.rb")
   rt.generator = "hanna" #Ignored if not there
-  rt.title = "#{PROJECT_TITLE} RDocs"
+  rt.title = "OpenRubyRMK common library RDocs"
   rt.main = "README.rdoc"
 end
 

@@ -12,7 +12,7 @@ If you want to write your own OpenRubyRMK client, you can build on top
 of this set of classes, it includes the basic definitions for managing
 commands, requests, etc.
 DESC
-  spec.version               = OpenRubyRMK::Common::VERSION.gsub("-", ".")
+  spec.version               = File.read("VERSION").strip.gsub("-", ".")
   spec.author                = "The OpenRubyRMK Team"
   spec.email                 = "openrubyrmk@googlemail.com"
   spec.homepage              = "http://devel.pegasus-alpha.eu/projects/openrubyrmk"
@@ -29,5 +29,5 @@ DESC
   # Options for RDoc
   spec.has_rdoc         = true
   spec.extra_rdoc_files = %w[README.rdoc COPYING]
-  spec.rdoc_options     << "-t" << "#{PROJECT_TITLE} RDocs" << "-m" << "README.rdoc"
+  spec.rdoc_options     << "-t" << "OpenRubyRMK common library RDocs RDocs" << "-m" << "README.rdoc"
 end
