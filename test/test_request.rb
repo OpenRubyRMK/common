@@ -26,6 +26,25 @@ class RequestTest < Test::Unit::TestCase
     assert_equal("98", req["bar"])
   end
 
+  def test_optional_parameters
+    req = Request.new(2, "foo")
+
+    # Unset and no default value => raise
+    assert_raises(Errors::UnknownParameter){req["bar"]}
+
+    # Unset and default value => default value
+    req.add_default_value("bar", "default stuff")
+    assert_equal("default stuff", req["bar"])
+
+    # Set and default value => set value
+    req["bar"] = "other stuff"
+    assert_equal("other stuff", req["bar"])
+
+    # Set and no default value => set value
+    req["baz"] = "foobar"
+    assert_equal("foobar", req["baz"])
+  end
+
   def test_equality
     req1 = Request.new(2, "foo")
     req2 = Request.new(2, :foo)

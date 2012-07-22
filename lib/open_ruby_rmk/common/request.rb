@@ -21,6 +21,23 @@ module OpenRubyRMK::Common
   #that happen. However, after receiving either OK or FINISHED, no more
   #responses will be added to the request.
   #
+  #Request, Response and Notification instances all have "parameters", i.e. any
+  #information sent with the respective action XML node. This
+  #information can be set and read via the #[]= and #[] methods,
+  #respectively. By default, when accessing an action’s parameters
+  #by use of #[], all parameters are treated as being required.
+  #This means that if you access a parameter +foo+ from a Request
+  #instance built from the XML a client sent to you, but the XML
+  #did not include a +foo+ tag, the #[] method will raise an
+  #UnknownParameter exception. If this is not what you desire, you
+  #can mark certain parameters as being _optional_ by means of
+  #the #add_default_value method. If you do so and the above
+  #case happens, instead of raising an exception the #[] method will
+  #return a default value you specified when calling #add_default_value.
+  #It is not possible to mark a parameter as optional in the XML
+  #representation, because that wouldn’t make any sense at all (it’s
+  #part of the _processing_ of the XML).
+  #
   #== Request types
   #This basic class doesn’t know anything about the actual request
   #types beyond the +type+ attribute. This means you can use it to
@@ -51,6 +68,12 @@ module OpenRubyRMK::Common
     #As they’re directly derived from the XML code,
     #both keys and values of this hash are strings.
     attr_accessor :parameters
+    #The default values for optional parameters. A hash
+    #of form:
+    #  {"optional_parameter_name" => "default value"}
+    #Note that for symmetry with #parameters, both keys
+    #and values should be strings here as well.
+    attr_accessor :default_parameter_values
 
     #Creates a new Request instance.
     #==Parameters
@@ -73,7 +96,20 @@ module OpenRubyRMK::Common
       @id         = id
       @type       = type.to_s
       @parameters = {}
+      @default_parameter_values = {}
       @responses  = []
+    end
+
+    #Mark a parameter as optional, i.e. cause #[] to not
+    #raise if the requested parameter doesn’t exist.
+    #==Parameters
+    #[name] The name of the parameter, either symbol or string.
+    #       Automatically converted to a string.
+    #[default_value] ("") A default value #[] shall return if
+    #                the parameter is missing. Automatically
+    #                converted to a string if necessary.
+    def add_default_value(name, default_value = "")
+      @default_parameter_values[name.to_s] = default_value.to_s
     end
 
     #Grabs the value of the specified parameter.
@@ -95,7 +131,14 @@ module OpenRubyRMK::Common
     #  req[:abc]  #=> "33"
     #  req["abc"] #=> "33"
     def [](par)
-      @parameters[par.to_s]
+      par = par.to_s
+      if @parameters.has_key?(par)
+        @parameters[par]
+      elsif @default_parameter_values.has_key?(par)
+        @default_parameter_values[par]
+      else
+        raise(Errors::UnknownParameter.new(self, par))
+      end
     end
 
     #Sets the specified parameter. Note no check happens whether

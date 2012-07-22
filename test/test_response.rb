@@ -32,6 +32,25 @@ class ResponseTest < Test::Unit::TestCase
     assert_equal("98", resp["bar"])
   end
 
+  def test_optional_parameters
+    res = Response.new(2, "ok", @request)
+
+    # Unset and no default value => raise
+    assert_raises(Errors::UnknownParameter){res["bar"]}
+
+    # Unset and default value => default value
+    res.add_default_value("bar", "default stuff")
+    assert_equal("default stuff", res["bar"])
+
+    # Set and default value => set value
+    res["bar"] = "other stuff"
+    assert_equal("other stuff", res["bar"])
+
+    # Set and no default value => set value
+    res["baz"] = "foobar"
+    assert_equal("foobar", res["baz"])
+  end
+
   def test_equality
     resp1 = Response.new(1, "ok", @request)
     resp2 = Response.new(1, :ok, @request)

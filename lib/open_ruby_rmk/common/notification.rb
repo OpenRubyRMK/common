@@ -12,6 +12,23 @@ module OpenRubyRMK::Common
   #tags that contain the real information this notification wants to
   #deliver.
   #
+  #Request, Response and Notification instances all have "parameters", i.e. any
+  #information sent with the respective action XML node. This
+  #information can be set and read via the #[]= and #[] methods,
+  #respectively. By default, when accessing an action’s parameters
+  #by use of #[], all parameters are treated as being required.
+  #This means that if you access a parameter +foo+ from a Request
+  #instance built from the XML a client sent to you, but the XML
+  #did not include a +foo+ tag, the #[] method will raise an
+  #UnknownParameter exception. If this is not what you desire, you
+  #can mark certain parameters as being _optional_ by means of
+  #the #add_default_value method. If you do so and the above
+  #case happens, instead of raising an exception the #[] method will
+  #return a default value you specified when calling #add_default_value.
+  #It is not possible to mark a parameter as optional in the XML
+  #representation, because that wouldn’t make any sense at all (it’s
+  #part of the _processing_ of the XML).
+  #
   #Notifications can only be created by Karfunkel; this is due to the
   #fact he is the only one knowing about all active connections. If you
   #want to share some information with other clients, you have to send
@@ -41,6 +58,12 @@ module OpenRubyRMK::Common
     #The key-value pairs making up this notification. As this is
     #parsed from the XML, both keys and values are *strings*.
     attr_accessor :parameters
+    #The default values for optional parameters. A hash
+    #of form:
+    #  {"optional_parameter_name" => "default value"}
+    #Note that for symmetry with #parameters, both keys
+    #and values should be strings here as well.
+    attr_accessor :default_parameter_values
 
     #Creates a new instance of this class.
     #==Parameters
@@ -56,12 +79,28 @@ module OpenRubyRMK::Common
       @parameters = {}
     end
 
+    #Mark a parameter as optional, i.e. cause #[] to not
+    #raise if the requested parameter doesn’t exist.
+    #==Parameters
+    #[name] The name of the parameter, either symbol or string.
+    #       Automatically converted to a string.
+    #[default_value] ("") A default value #[] shall return if
+    #                the parameter is missing. Automatically
+    #                converted to a string if necessary.
+    def add_default_value(name, default_value = "")
+      @default_parameter_values[name.to_s] = default_value.to_s
+    end
+
     #Reads a parameter from this notification.
     #==Parameter
     #[par] The name of the parameter you want to read.
     #      Automatically converted to a string by calling #to_s.
+    #==Raises
+    #[UnknownParameter] The requested parameter wasn’t passed
+    #                   and doesn’t have a default value.
     #==Return value
-    #nil if no matching parameter is found, a string otherwise.
+    #The (string) value of the specified parameter (or a default
+    #value).
     #==Example
     #  note = Notification.new(1, "Foo")
     #  note["foo"] = "bar"
@@ -72,7 +111,14 @@ module OpenRubyRMK::Common
     #  note[:abc]  #=> "33"
     #  note["abc"] #=> "33"
     def [](par)
-      @parameters[par.to_s]
+      par = par.to_s
+      if @parameters.has_key?(par)
+        @parameters[par]
+      elsif @default_parameter_values.has_key?(par)
+        @default_parameter_values[par]
+      else
+        raise(Errors::UnknownParameter.new(self, par))
+      end
     end
 
     #Sets a parameter of this notification.
