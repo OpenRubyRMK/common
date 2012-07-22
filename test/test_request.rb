@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-require "test/unit"
-require "pathname"
-
-require_relative "../lib/open_ruby_rmk/common"
+require_relative "helpers"
 
 class RequestTest < Test::Unit::TestCase
   include OpenRubyRMK::Common
