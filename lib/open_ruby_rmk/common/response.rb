@@ -190,6 +190,14 @@ module OpenRubyRMK::Common
       "#<#{self.class} #{request.type.upcase}:#{@status}>"
     end
 
+    #This is the same as:
+    #  response.request.type
+    #This method just exists for convenience and symmetry with
+    #the #type methods of Request and Notification.
+    def type
+      @request.type
+    end
+
   end
 
 end
